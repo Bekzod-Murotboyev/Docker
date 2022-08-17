@@ -157,8 +157,8 @@ target
  docker run --rm -d -p 8080:8080 --name springboot-server java-docker
 ```
 
-- `--rm `  `remove`  Automatically remove the container when it exits
-- `-d`  `detach`  Run container in background and print container ID
-- `-p`  `publish`  `<PORT_SERVER>:<PORT_CONTAINER>`  Publish a container's port(s) to the host
+- `--rm `   `remove`  Automatically remove the container when it exits
+- `-d`   `detach`  Run container in background and print container ID
+- `-p`   `publish`   `<PORT_SERVER>:<PORT_CONTAINER>`  Publish a container's port(s) to the host
 - `--name`  Assign a name to the container
 
