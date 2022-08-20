@@ -1,4 +1,4 @@
-# _[Docker](https://docs.docker.com/language/java/))_
+# _[Docker](https://docs.docker.com/language/java/)_
 
 ## _What is a container?_
 
