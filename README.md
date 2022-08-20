@@ -162,3 +162,51 @@ target
 - `-p`   `publish`   `<PORT_SERVER>:<PORT_CONTAINER>`  Publish a container's port(s) to the host
 - `--name`  Assign a name to the container
 
+## _Run a database in a container_
+
+- Let’s create our volumes now. We’ll create one for the data and one for configuration of Postgresql.
+
+```
+docker volume create postgres_data
+docker volume create postgres_config
+```
+
+- Now we’ll create a network that our application and database will use to talk to each other. The network is called a
+  user-defined bridge network and gives us a nice DNS lookup service which we can use when creating our connection
+  string.
+
+```
+docker network create postgres_net
+```
+
+- Now, let’s run Postgresql in a container and attach to the volumes and network we created above. Docker pulls the
+  image from Hub and runs it locally.
+
+```
+docker run -itd --rm  -v postgres_data:/var/lib/postgres \
+-v postgres_config:/etc/postgres/conf.d \
+--network postgres_net \
+--name postgres_server \
+-e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=<YOUR_PASSWORD> \
+-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=<YOUR_DATABASE> \
+-p 5432:5432 postgres
+```
+- Okay, now that we have a running Postgresql, let’s update our Dockerfile to activate the Postgresql Spring profile defined in the application and switch from an in-memory H2 database to the Postgresql server we just created.
+
+We only need to add the Postgresql profile as an argument to the CMD definition.
+```
+CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=postgres"]
+```
+- Let’s build our image.
+```
+ docker build -t java-docker .
+```
+- Now, let’s run our container. This time, we need to set the POSTGRESQL_URL environment variable so that our application knows what connection string to use to access the database. We’ll do this using the docker run command.
+
+```
+ docker run --rm -d \
+--name springboot-server \
+--network postgres_net \
+-e POSTGRESQL_URL=jdbc:postgresql://postgres_server/<YOUR_DATABASE> \
+-p 8080:8080 java-docker
+```
